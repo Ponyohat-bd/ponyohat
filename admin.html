@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PonyoHat Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 500px; background: #fff; padding: 20px; margin: auto; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background: #28a745; color: white; font-size: 16px; border: none; margin-top: 15px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>PonyoHat Admin Panel</h2>
+        <form id="productForm">
+            <label>প্রোডাক্টের নাম:</label>
+            <input type="text" id="name" placeholder="যেমন: Black Cap" required>
+
+            <label>ক্যাটাগরি:</label>
+            <select id="category">
+                <option value="Cap">Cap (টুপি)</option>
+                <option value="T-Shirt">T-Shirt (টি-শার্ট)</option>
+                <option value="Accessories">Accessories (অন্যান্য)</option>
+            </select>
+
+            <label>দাম (টাকা):</label>
+            <input type="number" id="price" placeholder="যেমন: 450" required>
+
+            <label>ছবির লিংক (Image URL):</label>
+            <input type="text" id="image" placeholder="https://..." required>
+
+            <button type="submit">প্রোডাক্ট যোগ করুন</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAQabeN6dZBWZG_757c5", 
+            authDomain: "ponyohat.firebaseapp.com",
+            projectId: "ponyohat",
+            storageBucket: "ponyohat.firebasestorage.app",
+            messagingSenderId: "77932544120",
+            appId: "1:77932544120:web:f4d1f9245",
+            measurementId: "G-5FTQYX1YFK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById("productForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById("name").value;
+            const category = document.getElementById("category").value;
+            const price = document.getElementById("price").value;
+            const image = document.getElementById("image").value;
+
+            try {
+                await addDoc(collection(db, "products"), {
+                    name: name,
+                    category: category,
+                    price: Number(price),
+                    image: image,
+                    createdAt: new Date()
+                });
+                alert("সফলভাবে প্রোডাক্ট যোগ করা হয়েছে!");
+                document.getElementById("productForm").reset();
+            } catch (error) {
+                alert("সমস্যা হয়েছে: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PonyoHat Store</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; max-width: 1000px; margin: 20px auto; }
+        .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .card img { max-width: 100%; height: 180px; object-fit: cover; border-radius: 5px; }
+        .price { color: #e44d26; font-size: 18px; font-weight: bold; margin: 10px 0; }
+        .buy-btn { background: #007bff; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to PonyoHat</h1>
+    <div class="product-grid" id="productGrid">
+        <p style="text-align:center; width:100%;">প্রোডাক্ট লোড হচ্ছে...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDAQabeN6dZBWZG_757c5", 
+            authDomain: "ponyohat.firebaseapp.com",
+            projectId: "ponyohat",
+            storageBucket: "ponyohat.firebasestorage.app",
+            messagingSenderId: "77932544120",
+            appId: "1:77932544120:web:f4d1f9245",
+            measurementId: "G-5FTQYX1YFK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadProducts() {
+            const productGrid = document.getElementById("productGrid");
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                productGrid.innerHTML = "";
+                
+                if(querySnapshot.empty) {
+                    productGrid.innerHTML = "<p style='grid-column: 1/-1;'>কোনো প্রোডাক্ট পাওয়া যায়নি।</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const product = doc.data();
+                    productGrid.innerHTML += `
+                        <div class="card">
+                            <img src="${product.image}" alt="${product.name}">
+                            <h3>${product.name}</h3>
+                            <div class="price">৳ ${product.price}</div>
+                            <button class="buy-btn">অর্ডার করুন</button>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                productGrid.innerHTML = "<p>ডাটা লোড করতে সমস্যা হয়েছে: " + error.message + "</p>";
+            }
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>
